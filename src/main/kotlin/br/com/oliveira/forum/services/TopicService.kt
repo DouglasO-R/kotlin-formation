@@ -1,72 +1,37 @@
 package br.com.oliveira.forum.services
 
-import br.com.oliveira.forum.model.Course
+import br.com.oliveira.forum.dto.NewTopicForm
+import br.com.oliveira.forum.dto.TopicView
+import br.com.oliveira.forum.mapper.TopicFormMapper
+import br.com.oliveira.forum.mapper.TopicViewMapper
 import br.com.oliveira.forum.model.Topic
-import br.com.oliveira.forum.model.User
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.stream.Collectors
 
 @Service
-class TopicService(private var topics: List<Topic>) {
+class TopicService(
+    private var topics: List<Topic> = ArrayList(),
 
-    init {
-        val topic = Topic(
-            id = 1,
-            title = "duvida kotlin",
-            message = "Variaveis no kotlin",
-            course = Course(
-                id = 1,
-                name = "Kotlin",
-                category = "Programacao"
-            ),
-            author = User(
-                id = 1,
-                name = "Douglas",
-                email = "douglas@oliveira.com"
-            ),
-        )
+    private val topicViewMapper: TopicViewMapper,
+    private val topicFormMapper: TopicFormMapper
+) {
 
-        val topic2 = Topic(
-            id = 2,
-            title = "duvida kotlin",
-            message = "Variaveis no kotlin",
-            course = Course(
-                id = 2,
-                name = "Kotlin",
-                category = "Programacao"
-            ),
-            author = User(
-                id = 2,
-                name = "Douglas",
-                email = "douglas@oliveira.com"
-            ),
-        )
 
-        val topic3 = Topic(
-            id = 3,
-            title = "duvida kotlin",
-            message = "Variaveis no kotlin",
-            course = Course(
-                id = 3,
-                name = "Kotlin",
-                category = "Programacao"
-            ),
-            author = User(
-                id = 3,
-                name = "Douglas",
-                email = "douglas@oliveira.com"
-            ),
-        )
-
-        topics = Arrays.asList(topic, topic2, topic3)
-
+    fun list(): List<TopicView> {
+        return topics.stream().map {
+            topic -> topicViewMapper.map(topic)
+        }.collect(Collectors.toList())
     }
 
-    fun list(): List<Topic> {
-        return topics
+    fun findById(id: Long): TopicView {
+        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        return topicViewMapper.map(topic)
     }
 
-    fun findById(id: Long): Topic {
-        return topics.stream().filter({t -> t.id == id}).findFirst().get()
+    fun add(dto: NewTopicForm) {
+        val topic = topicFormMapper.map(dto)
+        topic.id = topics.size.toLong()
+        topics = topics.plus(topic)
     }
 }
+
