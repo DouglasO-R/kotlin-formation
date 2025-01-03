@@ -8,18 +8,18 @@ import java.util.Arrays
 class CourseService(final var courses:List<Course>) {
     init {
         val kotlinCourse = Course(
-            id = courses.size.toLong() + 1,
+            id = 1,
             name = "Kotlin",
             category = "Programacao"
         )
         val javaCourse = Course(
-            id = courses.size.toLong() + 1,
+            id = 2,
             name = "java",
             category = "Programacao"
         )
 
         val phpCourse = Course(
-            id = courses.size.toLong() + 1,
+            id = 3,
             name = "Php",
             category = "Programacao"
         )

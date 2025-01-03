@@ -14,12 +14,12 @@ class UserService(final var users:List<User>) {
         )
 
         val user2 = User(
-            id = 1,
+            id = 2,
             name = "lucas",
             email = "lucas@oliveira.com"
         )
         val user3 = User(
-            id = 1,
+            id = 3,
             name = "victor",
             email = "vic@oliveira.com"
         )
