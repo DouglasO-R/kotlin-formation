@@ -3,6 +3,7 @@ package br.com.oliveira.forum.services
 import br.com.oliveira.forum.dto.NewTopicForm
 import br.com.oliveira.forum.dto.TopicView
 import br.com.oliveira.forum.dto.UpdateTopicForm
+import br.com.oliveira.forum.exception.NotFoundException
 import br.com.oliveira.forum.mapper.TopicFormMapper
 import br.com.oliveira.forum.mapper.TopicViewMapper
 import br.com.oliveira.forum.model.Topic
@@ -12,11 +13,10 @@ import java.util.stream.Collectors
 @Service
 class TopicService(
     private var topics: List<Topic> = ArrayList(),
-
     private val topicViewMapper: TopicViewMapper,
-    private val topicFormMapper: TopicFormMapper
+    private val topicFormMapper: TopicFormMapper,
+    private val notFoundMessage: String = "Topic not found"
 ) {
-
 
     fun list(): List<TopicView> {
         return topics.stream().map { topic ->
@@ -25,12 +25,14 @@ class TopicService(
     }
 
     fun findById(id: Long): TopicView {
-        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic =
+            topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow { NotFoundException(notFoundMessage) }
         return topicViewMapper.map(topic)
     }
 
     fun findTopicById(id: Long): Topic {
-        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic =
+            topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow { NotFoundException(notFoundMessage) }
         return topic
     }
 
@@ -42,7 +44,8 @@ class TopicService(
     }
 
     fun update(dto: UpdateTopicForm): TopicView {
-        val topic = topics.stream().filter { topic -> topic.id == dto.id }.findFirst().get()
+        val topic = topics.stream().filter { topic -> topic.id == dto.id }.findFirst()
+            .orElseThrow { NotFoundException(notFoundMessage) }
         val updatedTopic = Topic(
             id = dto.id,
             title = dto.title,
@@ -61,7 +64,8 @@ class TopicService(
     }
 
     fun delete(id: Long) {
-        val topic = topics.stream().filter { topic -> topic.id == id }.findFirst().get()
+        val topic = topics.stream().filter { topic -> topic.id == id }.findFirst()
+            .orElseThrow { NotFoundException(notFoundMessage) }
         topics = topics.minus(topic)
     }
 }
