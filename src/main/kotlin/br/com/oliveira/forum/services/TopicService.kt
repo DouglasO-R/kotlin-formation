@@ -6,10 +6,10 @@ import br.com.oliveira.forum.dto.UpdateTopicForm
 import br.com.oliveira.forum.exception.NotFoundException
 import br.com.oliveira.forum.mapper.TopicFormMapper
 import br.com.oliveira.forum.mapper.TopicViewMapper
-import br.com.oliveira.forum.model.Topic
 import br.com.oliveira.forum.repository.TopicRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import java.util.stream.Collectors
 
 @Service
 class TopicService(
@@ -19,10 +19,16 @@ class TopicService(
     private val notFoundMessage: String = "Topic not found"
 ) {
 
-    fun list(): List<TopicView> {
-        return repository.findAll().stream().map { topic ->
+    fun list(
+        courseName: String?,
+        pageable: Pageable
+    ): Page<TopicView> {
+        val topics =
+            if (courseName == null) repository.findAll(pageable) else repository.findByCourseName(courseName, pageable);
+
+        return topics.map { topic ->
             topicViewMapper.map(topic)
-        }.collect(Collectors.toList())
+        }
     }
 
     fun findById(id: Long): TopicView {

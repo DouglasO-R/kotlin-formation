@@ -5,6 +5,12 @@ import br.com.oliveira.forum.dto.TopicView
 import br.com.oliveira.forum.dto.UpdateTopicForm
 import br.com.oliveira.forum.services.TopicService
 import jakarta.validation.Valid
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -15,18 +21,25 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
 @RequestMapping("/v1/topics")
-class TopicController(private val service: TopicService) {
+class TopicController(
+    private val service: TopicService
+) {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun List(): List<TopicView> {
-        return service.list()
+    @Cacheable("topics")
+    fun List(
+        @RequestParam(required = false) courseName:String?,
+        @PageableDefault(size = 5, sort = ["createDate"], direction = Sort.Direction.DESC) pageable: Pageable
+    ): Page<TopicView> {
+        return service.list(courseName,pageable)
     }
 
     @GetMapping("/{id}")
@@ -37,6 +50,7 @@ class TopicController(private val service: TopicService) {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun add(
         @RequestBody @Valid dto:NewTopicForm,
         uriBuilder: UriComponentsBuilder
@@ -49,6 +63,7 @@ class TopicController(private val service: TopicService) {
 
     @PutMapping
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun update(@RequestBody @Valid dto: UpdateTopicForm): ResponseEntity<TopicView> {
         val topicView = service.update(dto)
         return ResponseEntity.ok(topicView)
@@ -57,6 +72,7 @@ class TopicController(private val service: TopicService) {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun delete(@PathVariable id:Long){
         service.delete(id)
     }

@@ -7,7 +7,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "courses")
 data class Course(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,
