@@ -1,6 +1,7 @@
 package br.com.oliveira.forum.controller
 
 import br.com.oliveira.forum.dto.NewTopicForm
+import br.com.oliveira.forum.dto.TopicPerCategoryDTO
 import br.com.oliveira.forum.dto.TopicView
 import br.com.oliveira.forum.dto.UpdateTopicForm
 import br.com.oliveira.forum.services.TopicService
@@ -75,6 +76,11 @@ class TopicController(
     @CacheEvict(value = ["topics"], allEntries = true)
     fun delete(@PathVariable id:Long){
         service.delete(id)
+    }
+
+    @GetMapping("/reports")
+    fun reports():List<TopicPerCategoryDTO>{
+        return service.reports()
     }
 }
 

@@ -1,6 +1,7 @@
 package br.com.oliveira.forum.services
 
 import br.com.oliveira.forum.dto.NewTopicForm
+import br.com.oliveira.forum.dto.TopicPerCategoryDTO
 import br.com.oliveira.forum.dto.TopicView
 import br.com.oliveira.forum.dto.UpdateTopicForm
 import br.com.oliveira.forum.exception.NotFoundException
@@ -53,6 +54,10 @@ class TopicService(
 
     fun delete(id: Long) {
         repository.deleteById(id)
+    }
+
+    fun reports(): List<TopicPerCategoryDTO> {
+        return repository.reports()
     }
 }
 
